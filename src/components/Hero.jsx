@@ -10,7 +10,7 @@ function Hero() {
       </h1>
       <p className='max-w-130 mt-2 text-sm md:text-base'>Unparalleled luxury and
        comfort await at the world's most exclusive hotels and resorts. Start your
-       journey today. hey added
+       journey today. 
        </p>
     </div>
   )
