@@ -3,19 +3,21 @@ import { assets, facilityIcons, roomsDummyData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import StarRating from '../components/StarRating';
 
-const CheckBox=({label,selected=false,onChange=()=>{}})=>{
+const CheckBox=({index,label,selected=false,onChange=()=>{}})=>{
+  const id = `checkbox-${index}`;
   return (
-    <label className='flex gap-3 items-center cursor-pointer mt-2 text-sm'>
-      <input type="checkbox" checked={selected} onChange={(e)=>onChange(e.target.checked,label)} />
+    <label htmlFor={id} className='flex gap-3 items-center cursor-pointer mt-2 text-sm'>
+      <input id={id} type="checkbox" name="checkBoxoption" checked={selected} onChange={(e)=>onChange(e.target.checked,label)} />
       <span className='font-light select-none'>{label}</span>
     </label>
   )
 }
 
-const RadioButton=({label,selected=false,onChange=()=>{}})=>{
+const RadioButton=({index,label,selected=false,onChange=()=>{}})=>{
+  const id = `Radio-${index}`;
   return (
-    <label className='flex gap-3 items-center cursor-pointer mt-2 text-sm'>
-      <input type="radio" name="sortOption" checked={selected} onChange={(e)=>onChange(label)} />
+    <label htmlFor={id} className='flex gap-3 items-center cursor-pointer mt-2 text-sm'>
+      <input id={id} type="radio" name="sortOption" checked={selected} onChange={(e)=>onChange(label)} />
       <span className='font-light select-none'>{label}</span>
     </label>
   )
@@ -88,7 +90,7 @@ function AllRooms() {
               <div className='px-5 py-5'>
                 <p className='font-medium text-gray-800 pb-2'>Popular Filters</p>
                 {roomTypes.map((roomType,index) => (
-                  <CheckBox key={index} label={roomType} />
+                  <CheckBox key={index} label={roomType} index={index}/>
                 ))}
               </div>
 
@@ -96,7 +98,7 @@ function AllRooms() {
               <div className='px-5 py-5'>
                 <p className='font-medium text-gray-800 pb-2'>Price Range</p>
                 {priceRanges.map((price,index) => (
-                  <CheckBox key={index} label={`$ ${price}`} />
+                  <CheckBox key={index} label={`$ ${price}`} index={index+4} />
                 ))}
               </div>
 
@@ -104,7 +106,7 @@ function AllRooms() {
                 <div className='px-5 py-5 pb-7'>
                 <p className='font-medium text-gray-800 pb-2'>Sort By</p>
                 {sortOptions.map((option,index) => (
-                  <RadioButton key={index} label={option} />
+                  <RadioButton key={index} label={option} index={index}/>
                 ))}
               </div>
 
