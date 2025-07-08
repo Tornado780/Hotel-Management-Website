@@ -11,7 +11,7 @@ const clerkWebhooks = async (req, res)=>{
             "svix-signature": req.headers ["svix-signature"],
             };
             // Verify the payload
-            const payload = await whook.verify(req.JSON.stringify(req.body), headers);
+            const payload = await whook.verify(JSON.stringify(req.body), headers);
             const { data,type } = payload;
             const userData ={
                 _id: data.id,
@@ -22,6 +22,7 @@ const clerkWebhooks = async (req, res)=>{
 
             switch(type){
                 case "user.created":
+                    console.log("hey i am in user")
                     await User.create(userData);
                     break;
                 case "user.updated":
