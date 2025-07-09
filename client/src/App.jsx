@@ -11,11 +11,26 @@ import Layout from './pages/hotelOwner/Layout'
 import Addroom from './pages/hotelOwner/Addroom'
 import Dashboard from './pages/hotelOwner/Dashboard'
 import ListRoom from './pages/hotelOwner/ListRoom'
+import SignupPage from './pages/SignUpPage'
+import LoginPage from './pages/LoginPage'
+import { useEffect, useState } from 'react'
 function App() {
    const isOwnerPath= useLocation().pathname.includes("owner");
+     const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/auth/me", {
+      credentials: "include", // ✅ include cookie
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setUser(data);
+      })
+      .catch(err => console.error("Auth check failed", err));
+  }, []);
   return (
     <div>
-     {!isOwnerPath && <Navbar />}
+     {!isOwnerPath && <Navbar user={user}/>}
       {false && <HotelReg />}
       <div className='min-h-[70vh]'>
            <Routes>
@@ -28,6 +43,8 @@ function App() {
                   <Route path='add-room' element={<Addroom/>}></Route>
                   <Route path='list-room' element={<ListRoom/>}></Route>
               </Route>
+              <Route path='/signup' element={<SignupPage/>}></Route>
+              <Route path='/login' element={<LoginPage/>}></Route>
           </Routes>
       </div>
       <Footer/>
