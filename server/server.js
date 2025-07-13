@@ -5,8 +5,7 @@ import  "dotenv/config";
 import db from "./configs/db.js";
 import cors from "cors";
 import cookieParser from 'cookie-parser';
-
-
+import bookingRoutes from "./routes/bookingRoutes.js";
 
 
 const app = express();
@@ -21,10 +20,17 @@ db();
 
 // Use routes
 app.use("/api/auth", authRoutes);
+app.use("/api/bookings", bookingRoutes);
+
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+})
 app.post("/api/auth/logout", (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ message: "Logged out successfully" });
 });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

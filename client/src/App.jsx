@@ -14,6 +14,7 @@ import ListRoom from './pages/hotelOwner/ListRoom'
 import SignupPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import { useEffect, useState } from 'react'
+import AdminRoute from './components/AdminRoute'
 function App() {
    const isOwnerPath= useLocation().pathname.includes("owner");
      const [user, setUser] = useState(null);
@@ -38,7 +39,11 @@ function App() {
               <Route path='/rooms' element={<AllRooms/>}/>
               <Route path='/rooms/:id' element={<RoomDetails/>}></Route>
               <Route path='/my-bookings' element={<MyBookings/>}></Route>
-              <Route path='/owner' element={<Layout/>} >
+              <Route path='/owner' element={
+                                            <AdminRoute>
+                                              <Layout/>
+                                            </AdminRoute>
+                                          } >
                   <Route index element={<Dashboard/>}></Route>
                   <Route path='add-room' element={<Addroom/>}></Route>
                   <Route path='list-room' element={<ListRoom/>}></Route>

@@ -64,9 +64,11 @@ const Navbar = ({user}) => {
                             <div className={`${isScrolled ? "bg-gray-700" : "bg-white"} h-0.5 w-0 group-hover:w-full transition-all duration-300`} />
                         </a>
                     ))}
-                    <button className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${isScrolled ? 'text-black' : 'text-white'} transition-all` } onClick={() => navigate('/owner')}>
-                       Dashboard
-                    </button>
+                       {user?.role === "admin" ? 
+                        (<a href="/owner" className="text-sm font-medium">  Dashboard</a>)
+                        : 
+                        (<a href="/my-bookings" className="text-sm font-medium"> My Bookings</a> )
+                        }
                 </div>
 
                 {/* Desktop Right */}

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { facilityIcons, roomsDummyData, roomCommonData } from '../assets/assets';
 import StarRating from '../components/StarRating';
 import { assets } from '../assets/assets';
+import BookingForm from '../components/BookingForm';
 const RoomDetails = () => {
     const {id} = useParams();
     const [room,setRoom] = useState(null);
@@ -64,36 +65,11 @@ const RoomDetails = () => {
       </div>
 
       {/* checkin and checkout */}
-      <form className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] rounded-xl mt-16 p-6 mx-auto max-w-6xl' >
-        <div className='flex flex-col flex-wrap gap-4 md:flex-row items-start md:items-center md:gap-10 text-gray-500'>
-
-           <div className='flex flex-col'>
-              <label htmlFor="checkInDate" className='font-medium'>Check-in Date</label>
-              <input type="date" name="checkInDate" id="checkInDate" className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required placeholder='Check-in'/>
-           </div>
-
-           <div className='w-px bg-gray-500/70 h-15 max-md:hidden'></div>
-
-           <div className='flex flex-col'>
-              <label htmlFor="checkOutDate" className='font-medium'>Check-out Date</label>
-              <input type="date" name="checkOutDate" id="checkOutDate" className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required placeholder='Check-out'/>
-           </div>
-           
-             <div className='w-px bg-gray-500/70 h-15 max-md:hidden'></div>
-
-           <div className='flex flex-col'>
-              <label htmlFor="guests" className='font-medium'>Guests</label>
-              <input type="number" name="guests" id="guests" className='max-w-20 rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required placeholder='0'/>
-           </div>
-
-
-        </div>
-
-        <button type='submit' className='bg-amber-500 hover:bg-primary-dull active:scale-95 transition-all rounded-md max-md:w-full max-md:mt-6 py-3 md:px-25 text-base cursor-pointer'>
-          Check Availability
-        </button>
-
-      </form>
+      <BookingForm
+        hotelName={room.hotel.name}
+        roomName={room.roomType}
+        pricePerNight={room.pricePerNight}
+      />
 
       {/* room specifications */}
       <div className='mt-25 space-y-4'>
