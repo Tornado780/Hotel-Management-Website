@@ -31,7 +31,7 @@ const MyBookings = () => {
         <p className="text-center mt-20 text-gray-500">Loading your bookings...</p>
       ) : bookings.length === 0 ? (
         <div className="mt-20 flex flex-col items-center text-center text-gray-600">
-          <img src={assets.noBookingIcon || assets.emptyIcon} alt="No bookings" className="w-48 h-48 mb-6" />
+          <img src={assets.totalBookingIcon|| assets.emptyIcon} alt="No bookings" className="w-48 h-48 mb-6" />
           <h2 className="text-2xl font-semibold">You have no bookings yet</h2>
           <p className="mt-2 max-w-md">
             Plan your next stay with us and experience premium comfort and convenience. Don’t miss out on our exclusive seasonal discounts!
@@ -75,7 +75,7 @@ const MyBookings = () => {
                     <img src={assets.guestsIcon} alt="guests-icon" />
                     <span>Guests: {booking.guests}</span>
                   </div>
-                  <p className="text-base">Price: ${booking.totalPrice}</p>
+                  <p className="text-base">Price: ${booking.price}</p>
                 </div>
               </div>
 
@@ -94,17 +94,34 @@ const MyBookings = () => {
               {/* Payment */}
               <div className="flex flex-col items-start justify-center pt-3">
                 <div className="flex items-center gap-2">
-                  <div className={`h-3 w-3 rounded-full ${booking.isPaid ? "bg-green-500" : "bg-red-500"}`}></div>
-                  <p className={`text-sm ${booking.isPaid ? "text-green-500" : "text-red-500"}`}>
-                    {booking.isPaid ? "Paid" : "Unpaid"}
+                  <div className={`h-3 w-3 rounded-full ${booking.paymentStatus==="completed" ? "bg-green-500" : "bg-red-500"}`}></div>
+                  <p className={`text-sm ${booking.paymentStatus==="completed" ? "text-green-500" : "text-red-500"}`}>
+                    {booking.paymentStatus==="completed" ? "Paid" : "Unpaid"}
                   </p>
                 </div>
 
-                {!booking.isPaid && (
-                  <button className="px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer">
-                    Pay Now
-                  </button>
-                )}
+                {booking.paymentStatus !== "completed" && (
+                <button
+                  className="px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch("http://localhost:5000/api/payment/pay", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ total: booking.price || "10.00" }), // pass dynamic price
+                      });
+                      const data = await res.json();
+                      window.location.href = data.url;
+                    } catch (err) {
+                      console.error("Payment initiation error:", err);
+                      alert("Failed to redirect to payment.");
+                    }
+                  }}
+                >
+                  Pay Now
+                </button>
+              )}
+
               </div>
             </div>
           ))}

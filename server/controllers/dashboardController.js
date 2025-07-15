@@ -13,8 +13,8 @@ export const getDashboardData = async (req, res) => {
     const bookings = await Booking.find()
       .sort({ createdAt: -1 })
       .limit(10)
-      .populate('user', 'username')    // 👈 get user.username only
-      .populate('room', 'roomType');   // 👈 get room.roomType only
+      .populate('user', 'name')    
+      .populate('room', 'roomType');   
 
     res.status(200).json({
       totalBookings,

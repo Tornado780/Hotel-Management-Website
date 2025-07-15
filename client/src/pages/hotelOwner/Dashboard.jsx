@@ -51,7 +51,7 @@ const Dashboard = () => {
           <img src={assets.totalRevenueIcon} alt="Total Revenue" className="h-10" />
           <div className="flex flex-col sm:ml-4 font-medium">
             <p className="text-lg text-blue-500">Total Revenue</p>
-            <p className="text-neutral-400 text-base">₹{dashboardData.totalRevenue}</p>
+            <p className="text-neutral-400 text-base">${dashboardData.totalRevenue}</p>
           </div>
         </div>
       </div>
@@ -70,15 +70,16 @@ const Dashboard = () => {
           </thead>
           <tbody className="text-sm">
             {dashboardData.bookings.map((item, index) => (
+                
               <tr key={index}>
                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
-                  {item.user?.username || 'Unknown User'}
+                  {item.user?.name || 'Unknown User'}
                 </td>
                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
                   {item.room?.roomType || 'N/A'}
                 </td>
                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
-                  ₹ {item.price || 0}
+                  $ {item.price || 0}
                 </td>
                 <td className='py-3 px-4 text-gray-700 border-t border-gray-300 flex '>
                   <button className={`py-1 px-3 rounded-full mx-auto text-xs ${

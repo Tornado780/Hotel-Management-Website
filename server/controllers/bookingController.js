@@ -15,16 +15,16 @@ export const createBooking = async (req, res) => {
       paymentStatus = "pending",
     } = req.body;
 
-    const userId = "665123abc123"; // temp for testing
-
-       console.log('roomId:', roomId);
+    
+      const userId = req.user._id;
+      console.log('roomId:', roomId);
       console.log('hotelId:', hotelId);
       console.log('userId:', userId);
 
     if (!hotelId || !roomId) {
       return res.status(400).json({ message: "Missing hotelId or roomId" });
     }
-
+   
     const booking = await Booking.create({
       user: new mongoose.Types.ObjectId(userId),
       hotel: new mongoose.Types.ObjectId(hotelId),

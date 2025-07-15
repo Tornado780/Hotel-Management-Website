@@ -17,17 +17,25 @@ import { useEffect, useState } from 'react'
 import AdminRoute from './components/AdminRoute'
 function App() {
    const isOwnerPath= useLocation().pathname.includes("owner");
-     const [user, setUser] = useState(null);
+    const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/auth/me", {
-      credentials: "include", // ✅ include cookie
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data) setUser(data);
-      })
-      .catch(err => console.error("Auth check failed", err));
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/me", {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+        setUser(null);
+      }
+    };
+
+    fetchUser();
   }, []);
   return (
     <div>
@@ -49,7 +57,8 @@ function App() {
                   <Route path='list-room' element={<ListRoom/>}></Route>
               </Route>
               <Route path='/signup' element={<SignupPage/>}></Route>
-              <Route path='/login' element={<LoginPage/>}></Route>
+              <Route path="/login" element={<LoginPage setUser={setUser} />} />
+
           </Routes>
       </div>
       <Footer/>

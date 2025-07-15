@@ -9,7 +9,7 @@ import bookingRoutes from "./routes/bookingRoutes.js";
 import hotelRoutes from "./routes/hotelRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
-
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 
 const app = express();
@@ -28,6 +28,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/payment', paymentRoutes);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 })
