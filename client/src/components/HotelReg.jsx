@@ -1,47 +1,203 @@
-import React from 'react';
-import { assets } from '../assets/assets';
-import { cities } from '../assets/assets';
-const HotelReg = () => {
+import React, { useState } from 'react';
+import axios from 'axios';
+import { AdvancedImage } from '@cloudinary/react';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { fill } from '@cloudinary/url-gen/actions/resize';
+
+const cld = new Cloudinary({
+  cloud: {
+    cloudName: 'dh8r6evzr' // replace with your actual Cloudinary cloud name
+  }
+});
+
+const HotelRoomForm = () => {
+  const [formData, setFormData] = useState({
+    hotel: '6874877d4abf70bee6663965',
+    roomType: '',
+    imageUrls: [],
+    pricePerNight: '',
+    amenities: []
+  });
+
+  const [uploading, setUploading] = useState(false);
+
+  const amenitiesList = ['Free WiFi', 'Free Breakfast', 'Room Service', 'Mountain View', 'Pool Access'];
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAmenityChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData(prev => {
+      const updated = checked
+        ? [...prev.amenities, value]
+        : prev.amenities.filter(a => a !== value);
+      return { ...prev, amenities: updated };
+    });
+  };
+
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    setUploading(true);
+
+    try {
+      const urls = await Promise.all(
+        files.map(async (file) => {
+          const data = new FormData();
+          data.append('file', file);
+          data.append('upload_preset', 'reverie'); // your preset name
+          data.append('folder', 'reverie-uploads');
+
+          const res = await axios.post(
+            'https://api.cloudinary.com/v1_1/dh8r6evzr/image/upload',
+            data
+          );
+
+          return res.data.secure_url;
+        })
+      );
+
+      setFormData(prev => ({
+        ...prev,
+        imageUrls: [...prev.imageUrls, ...urls]
+      }));
+    } catch (err) {
+      console.error('Cloudinary Upload Error:', err.response?.data || err);
+      alert('Image upload failed!');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      ...formData,
+      pricePerNight: Number(formData.pricePerNight)
+    };
+
+    console.log('Submitting Room Data:', payload);
+
+    try {
+      await axios.post('http://localhost:5000/api/rooms', payload);
+      alert('Room saved successfully!');
+
+      setFormData({
+        hotel: '6874877d4abf70bee6663965',
+        roomType: '',
+        imageUrls: [],
+        pricePerNight: '',
+        amenities: []
+      });
+    } catch (err) {
+      console.error('Error saving room:', err.response?.data || err.message || err);
+      alert('Failed to save room');
+    }
+  };
+
   return (
-    <div className='fixed top-0 bottom-0 left-0 right-0 z-100 flex items-center justify-center bg-black/70'>
-      <form className='flex bg-white rounded-xl max-w-4xl max-md:mx-2'>
-        <img src={assets.regImage} alt="reg-image" className='w-1/2 rounded-xl hidden md:block' />
-
-        <div className='relative flex flex-col items-center md:w-1/2 p-8 md:p-10'>
-          <img src={assets.closeIcon} alt="close-icon" className='absolute top-4 right-4 h-4 w-4 cursor-pointer' />
-          <p className='text-2xl font-semibold mt-6'>Register Your Hotel</p>
-
-          {/* hotel Name */}
-          <div className='w-full mt-4'>
-             <label htmlFor="name" className='font-medium text-gray-500'>Hotel Name</label>
-             <input type="text" name="name" id="name" placeholder='Enter your hotel name' className='w-full rounded border border-gray-200 px-3 py-2.5 mt-1 font-light outline-indigo-500' required />
-          </div>
-          
-          {/* contact */}
-           <div className='w-full mt-4'>
-             <label htmlFor="contact" className='font-medium text-gray-500'>Contact Number</label>
-             <input type="text" name="contact" id="contact" placeholder='Enter your contact number' className='w-full rounded border border-gray-200 px-3 py-2.5 mt-1 font-light outline-indigo-500' required />
-          </div>
-
-          {/* address */}
-           <div className='w-full mt-4'>
-             <label htmlFor="address" className='font-medium text-gray-500'>Address</label>
-             <input type="text" name="address" id="address" placeholder='Enter Hotel Address' className='w-full rounded border border-gray-200 px-3 py-2.5 mt-1 font-light outline-indigo-500' required />
-          </div>
-
-          {/* city drop down */}
-          <div className='w-full mt-4  mr-auto'>
-             <label htmlFor="city" className='font-medium text-gray-500'>City</label>
-             <select name="city" id="city" className='w-full rounded border border-gray-200 px-3 py-2.5 mt-1 font-light outline-indigo-500' required>
-               <option value="Select city">Select City</option>
-               {cities.map((city, index) => (<option key={index} value={city}>{city}</option>))}
-             </select>
-          </div>
-          <button className='mt-6 px-6 py-2 border border-gray-300 rounded bg-indigo-500 hover:bg-indigo-600 text-white transition-all cursor-pointer'>Register</button>
+    <div className="p-8 max-w-xl mx-auto bg-white rounded-xl shadow-md">
+      <h2 className="text-2xl font-bold mb-4">Add Room Details</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        
+        {/* Room Type */}
+        <div>
+          <label className="block text-gray-600 font-medium">Room Type</label>
+          <input
+            type="text"
+            name="roomType"
+            value={formData.roomType}
+            onChange={handleInputChange}
+            placeholder="e.g. Double Room"
+            className="w-full border rounded px-3 py-2 mt-1"
+            required
+          />
         </div>
+
+        {/* Image Upload */}
+        <div>
+          <label className="block text-gray-600 font-medium mb-1">Room Images</label>
+          <label className="flex flex-col items-center justify-center border border-dashed border-indigo-300 rounded-md p-4 cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition">
+            <span className="text-indigo-600 font-medium">Click to upload room images</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </label>
+          {uploading && <p className="text-sm text-blue-500 mt-1">Uploading...</p>}
+
+          {/* Optimized Cloudinary previews */}
+          {formData.imageUrls.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              {formData.imageUrls.map((url, idx) => {
+                const publicId = url
+                  .split('/')
+                  .slice(-2)
+                  .join('/')
+                  .replace(/\.[^/.]+$/, ''); // remove extension
+
+                const img = cld.image(publicId).resize(fill().width(300).height(150));
+
+                return (
+                  <AdvancedImage
+                    key={idx}
+                    cldImg={img}
+                    alt={`Room Preview ${idx + 1}`}
+                    className="w-full h-24 object-cover rounded shadow-sm"
+                  />
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Price */}
+        <div>
+          <label className="block text-gray-600 font-medium">Price Per Night</label>
+          <input
+            type="number"
+            name="pricePerNight"
+            value={formData.pricePerNight}
+            onChange={handleInputChange}
+            placeholder="e.g. 280"
+            className="w-full border rounded px-3 py-2 mt-1"
+            required
+          />
+        </div>
+
+        {/* Amenities */}
+        <div>
+          <label className="block text-gray-600 font-medium mb-1">Amenities</label>
+          <div className="flex gap-4 flex-wrap">
+            {amenitiesList.map((item, idx) => (
+              <label key={idx} className="flex items-center gap-2 text-gray-700">
+                <input
+                  type="checkbox"
+                  value={item}
+                  checked={formData.amenities.includes(item)}
+                  onChange={handleAmenityChange}
+                />
+                {item}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded mt-4"
+        >
+          Save Room
+        </button>
       </form>
     </div>
   );
 };
 
-export default HotelReg;
+export default HotelRoomForm;

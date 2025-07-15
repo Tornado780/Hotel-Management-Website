@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import { assets, facilityIcons, roomsDummyData } from '../assets/assets'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { assets, facilityIcons } from '../assets/assets';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import StarRating from '../components/StarRating';
 
 const CheckBox = ({ index, label, selected = false, onChange = () => {} }) => {
@@ -10,8 +11,8 @@ const CheckBox = ({ index, label, selected = false, onChange = () => {} }) => {
       <input id={id} type="checkbox" name="checkBoxoption" checked={selected} onChange={(e) => onChange(e.target.checked, label)} />
       <span className='font-light select-none'>{label}</span>
     </label>
-  )
-}
+  );
+};
 
 const RadioButton = ({ index, label, selected = false, onChange = () => {} }) => {
   const id = `Radio-${index}`;
@@ -20,12 +21,14 @@ const RadioButton = ({ index, label, selected = false, onChange = () => {} }) =>
       <input id={id} type="radio" name="sortOption" checked={selected} onChange={(e) => onChange(label)} />
       <span className='font-light select-none'>{label}</span>
     </label>
-  )
-}
+  );
+};
 
 function AllRooms() {
   const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
+  const [rooms, setRooms] = useState([]);
+
   const roomTypes = ["Single Bed", "Double Bed", "Luxury Room", "Family Suite"];
   const priceRanges = ['0 to 500', '500 to 1000', '1000 to 2000', '2000 to 3000'];
   const sortOptions = ["Price Low to High", "Price High to Low", "Newest First"];
@@ -33,6 +36,28 @@ function AllRooms() {
   const [selectedRoomTypes, setSelectedRoomTypes] = useState([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
   const [selectedSortOption, setSelectedSortOption] = useState("");
+
+  useEffect(() => {
+/*************  ✨ Windsurf Command 🌟  *************/
+
+  const fetchRooms = async () => {
+    try {
+     
+     const res = await axios.get('http://localhost:5000/api/rooms');
+
+      console.log('Rooms response:', res.data); // Log the response data
+
+      
+      console.log('Rooms response:', res.data);
+      setRooms(res.data);
+    } catch (err) {
+      console.error('Error fetching rooms:', err);
+    }
+  };
+
+  fetchRooms();
+}, []);
+
 
   const handleRoomTypeChange = (checked, label) => {
     setSelectedRoomTypes(prev =>
@@ -60,22 +85,30 @@ function AllRooms() {
           </p>
         </div>
 
-        {roomsDummyData.map((room) => (
+        {rooms.map((room) => (
           <div key={room._id} className='flex flex-col md:flex-row items-start gap-6 mt-10 py-10 border-b border-gray-300 last:pb-30 last:border-0'>
-            <img onClick={() => { navigate(`/rooms/${room._id}`); scrollTo(0, 0) }} src={room.images[0]} alt="" title='View Room Details' className='max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer' />
+            <img
+              onClick={() => { navigate(`/rooms/${room._id}`); scrollTo(0, 0); }}
+              src={room.images[0]}
+              alt=""
+              title='View Room Details'
+              className='max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer'
+            />
             <div className='flex flex-col gap-2 md:w-1/2'>
-              <p className='text-gray-500'>{room.hotel.city}</p>
-              <p onClick={() => { navigate(`/rooms/${room._id}`); scrollTo(0, 0) }} className='text-gray-800 text-3xl font-playfair cursor-pointer'>{room.hotel.name}</p>
+              <p className='text-gray-500'>{room.hotel?.city}</p>
+              <p onClick={() => { navigate(`/rooms/${room._id}`); scrollTo(0, 0); }} className='text-gray-800 text-3xl font-playfair cursor-pointer'>
+                {room.hotel?.name}
+              </p>
               <div className='flex items-center gap-1'>
                 <StarRating />
                 <p className='ml-2'>200+ reviews</p>
               </div>
               <div className='flex items-center gap-1 text-gray-500 mt-2 text-sm'>
                 <img src={assets.locationIcon} alt="" />
-                <span>{room.hotel.address}</span>
+                <span>{room.hotel?.address}</span>
               </div>
               <div className='flex flex-wrap items-center gap-4 mt-4 mb-6'>
-                {room.amenities.map((item, index) => (
+                {room.amenities?.map((item, index) => (
                   <div key={index} className='flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F5F5FF]/70'>
                     <img src={facilityIcons[item]} alt="" className='w-5 h-5' />
                     <p className='text-xs'>{item}</p>
@@ -123,7 +156,7 @@ function AllRooms() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default AllRooms
+export default AllRooms;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function BookingForm({ hotelName, roomName, pricePerNight }) {
+export default function BookingForm({ hotelId, roomId, pricePerNight }) {
   const [checkInDate, setCheckInDate]   = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
   const [guests, setGuests]             = useState(1);
@@ -14,15 +14,15 @@ export default function BookingForm({ hotelName, roomName, pricePerNight }) {
         headers: { "Content-Type": "application/json" },
         credentials: "include",                        // ← send cookie
         body: JSON.stringify({
-          hotelName,
-          roomName,
+          hotelId,
+          roomId,
           guests,
           price: pricePerNight,
           checkIn:  checkInDate,
           checkOut: checkOutDate,
         }),
       });
-
+      
       const data = await res.json();
       alert(res.ok ? "Booking successful!" : data.message || "Booking failed");
     } catch (err) {

@@ -45,7 +45,7 @@ function App() {
                                             </AdminRoute>
                                           } >
                   <Route index element={<Dashboard/>}></Route>
-                  <Route path='add-room' element={<Addroom/>}></Route>
+                  <Route path='add-room' element={<HotelReg/>}></Route>
                   <Route path='list-room' element={<ListRoom/>}></Route>
               </Route>
               <Route path='/signup' element={<SignupPage/>}></Route>
