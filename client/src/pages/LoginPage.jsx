@@ -8,7 +8,7 @@ export default function LoginPage({setUser}) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -19,7 +19,7 @@ export default function LoginPage({setUser}) {
       console.log("Login response:", data);
 
       if (res.ok) {
-        const userRes = await fetch("http://localhost:5000/api/auth/me", {
+        const userRes = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/me`, {
           credentials: "include",
         });
 

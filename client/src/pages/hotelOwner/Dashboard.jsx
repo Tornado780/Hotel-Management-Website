@@ -11,7 +11,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/dashboard'); // 🔁 Replace with your actual route
+        const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/dashboard`); // 🔁 Replace with your actual route
         setDashboardData(res.data);
         setLoading(false);
       } catch (err) {

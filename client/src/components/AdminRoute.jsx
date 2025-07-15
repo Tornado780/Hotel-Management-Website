@@ -8,7 +8,7 @@ export default function AdminRoute({ children }) {
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/auth/me", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/me`, {
       credentials: "include",
     })
       .then(res => res.ok ? res.json() : null)

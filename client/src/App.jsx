@@ -20,9 +20,10 @@ function App() {
     const [user, setUser] = useState(null);
 
   useEffect(() => {
+
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/me", {
+        const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/me`, {
           credentials: "include",
         });
         if (res.ok) {

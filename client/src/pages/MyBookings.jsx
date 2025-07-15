@@ -7,7 +7,7 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/bookings/my', {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings/my`, {
       credentials: 'include',
     })
       .then((res) => (res.ok ? res.json() : []))
@@ -105,7 +105,7 @@ const MyBookings = () => {
                   className="px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer"
                   onClick={async () => {
                     try {
-                      const res = await fetch("http://localhost:5000/api/payment/pay", {
+                      const res = await fetch("${import.meta.env.VITE_SERVER_URL}/api/payment/pay", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ total: booking.price || "10.00" }), // pass dynamic price

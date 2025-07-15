@@ -43,7 +43,7 @@ function AllRooms() {
   const fetchRooms = async () => {
     try {
      
-     const res = await axios.get('http://localhost:5000/api/rooms');
+     const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/rooms`);
 
       console.log('Rooms response:', res.data); // Log the response data
 

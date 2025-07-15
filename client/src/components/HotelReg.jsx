@@ -82,7 +82,7 @@ const HotelRoomForm = () => {
     console.log('Submitting Room Data:', payload);
 
     try {
-      await axios.post('http://localhost:5000/api/rooms', payload);
+      await axios.post('${import.meta.env.VITE_SERVER_URL}/api/rooms', payload);
       alert('Room saved successfully!');
 
       setFormData({

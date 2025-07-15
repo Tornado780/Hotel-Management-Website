@@ -14,7 +14,7 @@ const RoomDetails = () => {
   useEffect(() => {
     const fetchRoom = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/rooms/${id}`);
+        const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/rooms/${id}`);
         setRoom(res.data);
         setMainImage(res.data.images[0]);
       } catch (err) {

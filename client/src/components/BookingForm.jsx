@@ -11,7 +11,7 @@ export default function BookingForm({ hotelId, roomId, pricePerNight }) {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/bookings", {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // ← send cookie

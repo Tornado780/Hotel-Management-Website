@@ -2,7 +2,7 @@ export default function BookingConfirmationModal({ show, onClose,pricePerNight }
   if (!show) return null;
 
   const handlePayNow = async () => {
-  const res = await fetch("http://localhost:5000/api/payment/pay", {
+  const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/payment/pay`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ total: pricePerNight }), // pass the actual amount
