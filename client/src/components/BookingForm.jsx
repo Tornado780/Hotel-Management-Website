@@ -30,6 +30,7 @@ export default function BookingForm({ hotelId, roomId, pricePerNight }) {
       if (res.ok) {
         // Show "Pay Now or Later" modal after successful booking
         setShowPaymentModal(true);
+        alert("Booking successful!");
       } else {
         alert(data.message || "Booking failed");
       }
