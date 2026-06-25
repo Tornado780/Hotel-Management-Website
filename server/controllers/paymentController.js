@@ -7,8 +7,8 @@ export const createPayment = (req, res) => {
     intent: 'sale',
     payer: { payment_method: 'paypal' },
     redirect_urls: {
-      return_url: 'http://localhost:5173/api/rooms',
-      cancel_url: 'http://localhost:5173/api/rooms',
+      return_url: `${process.env.FRONTEND_URL}/rooms`,
+      cancel_url: `${process.env.FRONTEND_URL}/rooms`,
     },
     transactions: [{
       amount: {

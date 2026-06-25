@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage({setUser}) {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -19,15 +19,31 @@ export default function LoginPage({setUser}) {
       console.log("Login response:", data);
 
       if (res.ok) {
+        const token = data.token;
+        if (token) {
+          localStorage.setItem('authToken', token);
+        }
+
         const userRes = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/me`, {
           credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
 
-        const user = await userRes.json();
-        console.log("Fetched user after login:", user);
-
-        setUser(user); // ✅ Update App-level user
-        navigate("/");
+        if (userRes.ok) {
+          const user = await userRes.json();
+          console.log("Fetched user after login:", user);
+          setUser(user); // ✅ Update App-level user
+          navigate("/");
+        } else {
+          const userData = await userRes.json().catch(() => ({}));
+          console.error("Failed to fetch user after login", userData);
+          if (data.user) {
+            setUser(data.user);
+            navigate("/");
+          } else {
+            alert("Login succeeded but user fetch failed. Please refresh.");
+          }
+        }
       } else {
         alert(data.message || "Login failed");
       }
@@ -61,9 +77,20 @@ export default function LoginPage({setUser}) {
         required
       />
 
+      <div className="flex justify-between items-center text-sm text-gray-600">
+        <Link to="/forgot-password" className="underline hover:text-black">
+          Forgot password?
+        </Link>
+        <span>
+          New here? <Link to="/signup" className="text-black underline">Sign up</Link>
+        </span>
+      </div>
+
       <button type="submit" className="bg-black text-white px-4 py-2 rounded">
         Login
       </button>
     </form>
   );
 }
+
+

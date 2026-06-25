@@ -66,6 +66,9 @@ export default function ForgotPasswordPage() {
             </button>
           </form>
         )}
+        <div className="mt-4 text-center text-sm text-gray-600">
+          Remembered your password? <a href="/login" className="text-black underline">Login here</a>.
+        </div>
       </div>
     </div>
   );

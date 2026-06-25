@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { assets, facilityIcons } from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -37,18 +37,51 @@ function AllRooms() {
   const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
   const [selectedSortOption, setSelectedSortOption] = useState("");
 
+  const handleClearFilters = () => {
+    setSelectedRoomTypes([]);
+    setSelectedPriceRanges([]);
+    setSelectedSortOption("");
+  };
+
+  const filteredRooms = useMemo(() => {
+    return rooms
+      .filter((room) => {
+        const matchesType =
+          selectedRoomTypes.length === 0 || selectedRoomTypes.includes(room.roomType);
+
+        const matchesPrice =
+          selectedPriceRanges.length === 0 || selectedPriceRanges.some((rangeLabel) => {
+            const range = rangeLabel.replace('$ ', '').split(' to ').map(Number);
+            if (range.length !== 2 || !room.pricePerNight) return true;
+            return room.pricePerNight >= range[0] && room.pricePerNight <= range[1];
+          });
+
+        return matchesType && matchesPrice;
+      })
+      .sort((a, b) => {
+        if (selectedSortOption === 'Price Low to High') {
+          return a.pricePerNight - b.pricePerNight;
+        }
+        if (selectedSortOption === 'Price High to Low') {
+          return b.pricePerNight - a.pricePerNight;
+        }
+        if (selectedSortOption === 'Newest First') {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        return 0;
+      });
+  }, [rooms, selectedRoomTypes, selectedPriceRanges, selectedSortOption]);
+
   useEffect(() => {
-/*************  ✨ Windsurf Command 🌟  *************/
+
 
   const fetchRooms = async () => {
     try {
-     
+    console.log(`${import.meta.env.VITE_SERVER_URL}/api/rooms`);
+    
      const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/rooms`);
 
       console.log('Rooms response:', res.data); // Log the response data
-
-      
-      console.log('Rooms response:', res.data);
       setRooms(res.data);
     } catch (err) {
       console.error('Error fetching rooms:', err);
@@ -85,7 +118,11 @@ function AllRooms() {
           </p>
         </div>
 
-        {rooms.map((room) => (
+        {filteredRooms.length === 0 ? (
+          <div className='mt-12 text-gray-600'>
+            No rooms match the selected filters. Try clearing filters or selecting a different combination.
+          </div>
+        ) : filteredRooms.map((room) => (
           <div key={room._id} className='flex flex-col md:flex-row items-start gap-6 mt-10 py-10 border-b border-gray-300 last:pb-30 last:border-0'>
             <img
               onClick={() => { navigate(`/rooms/${room._id}`); scrollTo(0, 0); }}
@@ -127,7 +164,7 @@ function AllRooms() {
             <p className='text-base font-medium border-gray-800'>FILTERS</p>
             <div className='text-xs cursor-pointer'>
               <span onClick={() => setOpenFilters(!openFilters)} className='lg:hidden'>{openFilters ? 'HIDE' : 'SHOW'}</span>
-              <span className='hidden lg:block'>CLEAR</span>
+              <span className='hidden lg:block hover:text-gray-900' onClick={handleClearFilters}>CLEAR</span>
             </div>
           </div>
 

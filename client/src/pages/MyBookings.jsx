@@ -19,6 +19,29 @@ const MyBookings = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings/${bookingId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.message || 'Cancel request failed');
+      }
+
+      setBookings((prev) =>
+        prev.map((booking) =>
+          booking._id === bookingId ? { ...booking, paymentStatus: 'cancelled' } : booking
+        )
+      );
+    } catch (err) {
+      console.error('Cancel booking failed:', err);
+      alert('Unable to cancel booking.');
+    }
+  };
+
   return (
     <div className="py-28 md:pb-35 md:pt-32 px-4 md:px-16 lg:px-24 xl:px-32">
       <Title
@@ -100,17 +123,27 @@ const MyBookings = () => {
                   </p>
                 </div>
 
-                {booking.paymentStatus !== "completed" && (
+                {booking.paymentStatus !== "completed" && booking.paymentStatus !== "cancelled" && (
                 <button
                   className="px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer"
                   onClick={async () => {
                     try {
-                      const res = await fetch("${import.meta.env.VITE_SERVER_URL}/api/payment/pay", {
+                      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/payment/pay`, {
                         method: "POST",
+                        credentials: 'include',
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ total: booking.price || "10.00" }), // pass dynamic price
+                        body: JSON.stringify({ total: booking.price || "10.00" }),
                       });
-                      const data = await res.json();
+
+                      if (!res.ok) {
+                        const txt = await res.text();
+                        throw new Error(`Payment init failed: ${res.status} ${txt}`);
+                      }
+
+                      const text = await res.text();
+                      const data = text ? JSON.parse(text) : null;
+                      if (!data || !data.url) throw new Error('No payment redirect URL returned');
+
                       window.location.href = data.url;
                     } catch (err) {
                       console.error("Payment initiation error:", err);
@@ -120,6 +153,19 @@ const MyBookings = () => {
                 >
                   Pay Now
                 </button>
+              )}
+
+              {booking.paymentStatus !== "cancelled" && (
+                <button
+                  className="px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer"
+                  onClick={() => handleCancelBooking(booking._id)}
+                >
+                  Cancel Booking
+                </button>
+              )}
+
+              {booking.paymentStatus === "cancelled" && (
+                <p className="mt-4 text-sm text-red-600 font-semibold">Booking cancelled</p>
               )}
 
               </div>

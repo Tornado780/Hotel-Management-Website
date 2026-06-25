@@ -35,6 +35,7 @@ const Navbar = ({ user }) => {
       method: "POST",
       credentials: "include",
     });
+    localStorage.removeItem('authToken');
     window.location.reload();
   };
 

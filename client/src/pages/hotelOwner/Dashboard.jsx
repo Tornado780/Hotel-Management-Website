@@ -11,7 +11,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/dashboard`); // 🔁 Replace with your actual route
+        const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/dashboard`);
         setDashboardData(res.data);
         setLoading(false);
       } catch (err) {
@@ -23,6 +23,29 @@ const Dashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+  const handleAdminCancel = async (bookingId) => {
+    if (!confirm('Cancel this booking? This action cannot be undone.')) return;
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings/admin/${bookingId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.message || 'Cancel failed');
+      }
+
+      setDashboardData(prev => ({
+        ...prev,
+        bookings: prev.bookings.map(b => b._id === bookingId ? { ...b, paymentStatus: 'cancelled' } : b)
+      }));
+    } catch (err) {
+      console.error('Admin cancel failed:', err);
+      alert('Unable to cancel booking.');
+    }
+  };
 
   if (loading) return <p className="text-gray-600">Loading dashboard...</p>;
   if (error) return <p className="text-red-600">{error}</p>;
@@ -37,7 +60,6 @@ const Dashboard = () => {
       />
 
       <div className="flex gap-4 my-8 flex-wrap">
-        {/* Total Bookings */}
         <div className="bg-primary/3 border border-primary/10 p-6 rounded-xl flex items-center gap-4 shadow-sm pr-8">
           <img src={assets.totalBookingIcon} alt="Total Bookings" className="h-10" />
           <div className="flex flex-col sm:ml-4 font-medium">
@@ -46,7 +68,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Total Revenue */}
         <div className="bg-primary/3 border border-primary/10 p-6 rounded-xl flex items-center gap-4 shadow-sm pr-8">
           <img src={assets.totalRevenueIcon} alt="Total Revenue" className="h-10" />
           <div className="flex flex-col sm:ml-4 font-medium">
@@ -66,11 +87,11 @@ const Dashboard = () => {
               <th className="py-3 px-4 text-gray-800 font-medium max-sm:hidden">Room Name</th>
               <th className="py-3 px-4 text-gray-800 font-medium text-center">Total Amount</th>
               <th className="py-3 px-4 text-gray-800 font-medium text-center">Payment Status</th>
+              <th className="py-3 px-4 text-gray-800 font-medium text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="text-sm">
             {dashboardData.bookings.map((item, index) => (
-                
               <tr key={index}>
                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
                   {item.user?.name || 'Unknown User'}
@@ -82,13 +103,27 @@ const Dashboard = () => {
                   $ {item.price || 0}
                 </td>
                 <td className='py-3 px-4 text-gray-700 border-t border-gray-300 flex '>
-                  <button className={`py-1 px-3 rounded-full mx-auto text-xs ${
-                    item.paymentStatus === 'completed'
-                      ? 'bg-green-200 text-green-600'
-                      : 'bg-yellow-200 text-yellow-600'
-                  }`}>
-                    {item.paymentStatus === 'completed' ? 'Completed' : 'Pending'}
-                  </button>
+                  <div className="mx-auto">
+                    <button className={`py-1 px-3 rounded-full text-xs ${
+                      item.paymentStatus === 'completed'
+                        ? 'bg-green-200 text-green-600'
+                        : item.paymentStatus === 'cancelled'
+                        ? 'bg-red-200 text-red-600'
+                        : 'bg-yellow-200 text-yellow-600'
+                    }`}>
+                      {item.paymentStatus === 'completed' ? 'Completed' : item.paymentStatus === 'cancelled' ? 'Cancelled' : 'Pending'}
+                    </button>
+                  </div>
+                </td>
+                <td className="py-3 px-4 text-gray-700 border-t border-gray-300 text-center">
+                  {item.paymentStatus !== 'cancelled' && (
+                    <button
+                      onClick={() => handleAdminCancel(item._id)}
+                      className="px-4 py-1.5 text-xs border border-gray-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer"
+                    >
+                      Cancel Booking
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

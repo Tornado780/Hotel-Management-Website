@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function SignupPage() {
+export default function SignupPage({ setUser }) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
 
@@ -17,7 +17,44 @@ export default function SignupPage() {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Signup successful!");
+      try {
+        const loginRes = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email: form.email, password: form.password }),
+        });
+
+        const loginData = await loginRes.json();
+        const token = loginData.token;
+        if (token) {
+          localStorage.setItem('authToken', token);
+        }
+
+        if (loginRes.ok) {
+          const userRes = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/me`, {
+            credentials: "include",
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          });
+
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            setUser?.(userData);
+            navigate("/");
+            return;
+          }
+
+          if (loginData.user) {
+            setUser?.(loginData.user);
+            navigate("/");
+            return;
+          }
+        }
+      } catch (loginErr) {
+        console.error("Auto-login after signup failed:", loginErr);
+      }
+
+      alert("Signup successful! Please log in.");
       navigate("/login");
     } else {
       alert(data.message || "Signup failed");

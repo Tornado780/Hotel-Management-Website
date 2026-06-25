@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: true,
+  origin: process.env.FRONTEND_URL || true,
   credentials: true,
 }));
 app.use(cookieParser());
@@ -30,13 +30,12 @@ app.use("/api/rooms", roomRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/payment', paymentRoutes);
 app.get("/", (req, res) => {
-  res.send("API is Running");
+  res.send("Hello World!");
 })
 app.post("/api/auth/logout", (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ message: "Logged out successfully" });
 });
-
 
 
 const PORT = process.env.PORT || 5000;

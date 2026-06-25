@@ -34,6 +34,7 @@ export default function BookingForm({ hotelId, roomId, pricePerNight }) {
       } else {
         alert(data.message || "Booking failed");
       }
+      
     } catch (err) {
       console.error("Booking error:", err);
       alert("Something went wrong");

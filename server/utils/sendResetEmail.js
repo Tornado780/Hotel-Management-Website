@@ -1,13 +1,13 @@
 import nodemailer from "nodemailer";
 
 export async function sendResetEmail(to, token) {
-  const link = `http://localhost:5173/reset-password/${token}`; // adjust frontend URL
+  const link = `${process.env.FRONTEND_URL}/reset-password/${token}`; 
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.SMTP_USER, // your email
-      pass: process.env.SMTP_PASS, // app password
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS, 
     },
   });
 
